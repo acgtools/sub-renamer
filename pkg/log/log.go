@@ -13,7 +13,7 @@ const (
 	ErrorLevel = slog.LevelError
 )
 
-func ParseLogLevel(lvl string) (slog.Level, error) {
+func ParseLevel(lvl string) (slog.Level, error) {
 	switch strings.ToLower(lvl) {
 	case "debug":
 		return DebugLevel, nil
@@ -24,7 +24,6 @@ func ParseLogLevel(lvl string) (slog.Level, error) {
 	case "error":
 		return ErrorLevel, nil
 	default:
-		return 0, fmt.Errorf("unrecognized level %s", lvl)
-
+		return 0, fmt.Errorf("unrecognized level: %s", lvl)
 	}
 }

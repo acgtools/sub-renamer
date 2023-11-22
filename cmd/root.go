@@ -16,14 +16,14 @@ var logLevel string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "sub-renamer",
-	Short: "Auto-rename video and subtitle files",
-	Long:  `TODO://`,
+	Short: "Auto rename subtitle files to match video files",
+	Long:  "sub-renamer <video dir> <sub dir>",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 2 {
 			return errors.New("not enough args")
 		}
 
-		logLevel, err := log.ParseLogLevel(logLevel)
+		logLevel, err := log.ParseLevel(logLevel)
 		if err != nil {
 			return err
 		}
@@ -74,7 +74,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "debug", "log level")
+	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "log level")
 }
 
 func Execute() {
