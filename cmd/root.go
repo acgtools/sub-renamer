@@ -1,51 +1,85 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
-	"os"
-
+	"errors"
+	"github.com/dreamjz/sub-renamer/pkg/episode"
+	"github.com/dreamjz/sub-renamer/pkg/log"
 	"github.com/spf13/cobra"
+	"log/slog"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
-
+var logLevel string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "sub-renamer",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "Auto-rename video and subtitle files",
+	Long:  `TODO://`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 2 {
+			return errors.New("not enough args")
+		}
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+		logLevel, err := log.ParseLogLevel(logLevel)
+		if err != nil {
+			return err
+		}
+		logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
+		slog.SetDefault(logger)
+
+		vidDir, subDir := args[0], args[1]
+		if !filepath.IsAbs(vidDir) {
+			vidDir, err = filepath.Abs(vidDir)
+			if err != nil {
+				return err
+			}
+		}
+		if !filepath.IsAbs(subDir) {
+			subDir, err = filepath.Abs(subDir)
+			if err != nil {
+				return err
+			}
+		}
+
+		vidMap, err := episode.ParseEpisodes(vidDir)
+		if err != nil {
+			return err
+		}
+		subMap, err := episode.ParseEpisodes(subDir)
+		if err != nil {
+			return err
+		}
+
+		for ep, vidName := range vidMap {
+			subName, ok := subMap[ep]
+			if !ok {
+				continue
+			}
+
+			subExt := filepath.Ext(subName)
+
+			newSubName := strings.TrimSuffix(vidName, filepath.Ext(vidName))
+
+			err := os.Rename(filepath.Join(subDir, subName), filepath.Join(subDir, newSubName+subExt))
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+func init() {
+	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "debug", "log level")
+}
+
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
 }
-
-func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.sub-renamer.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-
