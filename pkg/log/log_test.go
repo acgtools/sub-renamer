@@ -1,72 +1,79 @@
-package log
+package log_test
 
 import (
 	"log/slog"
 	"testing"
 
+	"github.com/dreamjz/sub-renamer/pkg/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseLevel(t *testing.T) {
+	t.Parallel()
+
 	for _, tc := range []struct {
 		name        string
 		lvl         string
 		parsedLevel slog.Level
-		hasErr      bool
+		wantErr     bool
 	}{
 		{
 			name:        "Empty string",
 			lvl:         "",
 			parsedLevel: 0,
-			hasErr:      true,
+			wantErr:     true,
 		},
 		{
 			name:        "Uppercase level",
 			lvl:         "DEBUG",
-			parsedLevel: DebugLevel,
-			hasErr:      false,
+			parsedLevel: log.DebugLevel,
+			wantErr:     false,
 		},
 		{
 			name:        "Debug",
 			lvl:         "debug",
-			parsedLevel: DebugLevel,
-			hasErr:      false,
+			parsedLevel: log.DebugLevel,
+			wantErr:     false,
 		},
 		{
 			name:        "Info",
 			lvl:         "info",
-			parsedLevel: InfoLevel,
-			hasErr:      false,
+			parsedLevel: log.InfoLevel,
+			wantErr:     false,
 		},
 		{
 			name:        "Warn",
 			lvl:         "warn",
-			parsedLevel: WarnLevel,
-			hasErr:      false,
+			parsedLevel: log.WarnLevel,
+			wantErr:     false,
 		},
 		{
 			name:        "Error",
 			lvl:         "error",
-			parsedLevel: ErrorLevel,
-			hasErr:      false,
+			parsedLevel: log.ErrorLevel,
+			wantErr:     false,
 		},
 		{
 			name:        "Unsupported level",
 			lvl:         "XXX",
 			parsedLevel: 0,
-			hasErr:      true,
+			wantErr:     true,
 		},
 	} {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			l, err := ParseLevel(tc.lvl)
+			t.Parallel()
+
+			l, err := log.ParseLevel(tc.lvl)
 
 			assert.Equal(t, tc.parsedLevel, l)
 
-			if tc.hasErr {
-				assert.NotNil(t, err)
-				assert.ErrorContains(t, err, "unrecognized level: ")
+			if tc.wantErr {
+				require.Error(t, err)
+				require.ErrorContains(t, err, "unrecognized level: ")
 			} else {
-				assert.Nil(t, err)
+				require.NoError(t, err)
 			}
 		})
 	}

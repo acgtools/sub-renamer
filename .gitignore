@@ -23,5 +23,4 @@ go.work
 # Goland file
 .idea
 
-# test files
-test-data
+test

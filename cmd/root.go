@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"errors"
+	"log/slog"
+	"os"
+
 	"github.com/dreamjz/sub-renamer/pkg/episode"
 	"github.com/dreamjz/sub-renamer/pkg/log"
 	"github.com/spf13/cobra"
-	"log/slog"
-	"os"
-	"path/filepath"
-	"strings"
 )
+
+const minArgNum = 2
 
 var logLevel string
 
@@ -19,61 +20,22 @@ var rootCmd = &cobra.Command{
 	Short: "Auto rename subtitle files to match video files",
 	Long:  "sub-renamer <video dir> <sub dir>",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) < 2 {
+		if len(args) < minArgNum {
 			return errors.New("not enough args")
 		}
 
 		logLevel, err := log.ParseLevel(logLevel)
 		if err != nil {
-			return err
+			return err //nolint:wrapcheck
 		}
 		logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
 		slog.SetDefault(logger)
 
-		vidDir, subDir := args[0], args[1]
-		if !filepath.IsAbs(vidDir) {
-			vidDir, err = filepath.Abs(vidDir)
-			if err != nil {
-				return err
-			}
-		}
-		if !filepath.IsAbs(subDir) {
-			subDir, err = filepath.Abs(subDir)
-			if err != nil {
-				return err
-			}
-		}
-
-		vidMap, err := episode.ParseEpisodes(vidDir)
-		if err != nil {
-			return err
-		}
-		subMap, err := episode.ParseEpisodes(subDir)
-		if err != nil {
-			return err
-		}
-
-		for ep, vidName := range vidMap {
-			subName, ok := subMap[ep]
-			if !ok {
-				continue
-			}
-
-			subExt := filepath.Ext(subName)
-
-			newSubName := strings.TrimSuffix(vidName, filepath.Ext(vidName))
-
-			err := os.Rename(filepath.Join(subDir, subName), filepath.Join(subDir, newSubName+subExt))
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
+		return episode.AutoRename(args[0], args[1]) //nolint:wrapcheck
 	},
 }
 
-func init() {
+func init() { //nolint:gochecknoinits
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "log level")
 }
 

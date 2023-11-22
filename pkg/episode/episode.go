@@ -2,26 +2,73 @@ package episode
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
-var ()
+const minFileNum = 2
 
-func ParseEpisodes(dir string) (map[int]string, error) {
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return nil, err
+func AutoRename(vidDir, subDir string) error {
+	var err error
+
+	if !filepath.IsAbs(vidDir) {
+		vidDir, err = filepath.Abs(vidDir)
+		if err != nil {
+			return fmt.Errorf("failed to convert video path %q to absolute path: %w", vidDir, err)
+		}
+	}
+	if !filepath.IsAbs(subDir) {
+		subDir, err = filepath.Abs(subDir)
+		if err != nil {
+			return fmt.Errorf("failed to convert subtitle path %q to absolute path: %w", subDir, err)
+		}
 	}
 
-	if len(entries) < 2 {
+	vidMap, err := parseEpisodes(vidDir)
+	if err != nil {
+		return fmt.Errorf("failed to parse video episode: %w", err)
+	}
+	subMap, err := parseEpisodes(subDir)
+	if err != nil {
+		return fmt.Errorf("failed to parse subtitle episode: %w", err)
+	}
+
+	for ep, vidName := range vidMap {
+		subName, ok := subMap[ep]
+		if !ok {
+			continue
+		}
+
+		subExt := filepath.Ext(subName)
+
+		newSubName := strings.TrimSuffix(vidName, filepath.Ext(vidName))
+
+		err = os.Rename(filepath.Join(subDir, subName), filepath.Join(subDir, newSubName+subExt))
+		if err != nil {
+			return fmt.Errorf("failed to rename subtitle file: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func parseEpisodes(dir string) (map[int]string, error) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read directory: %q, %w", dir, err)
+	}
+
+	if len(entries) < minFileNum {
 		return nil, errors.New("number of file must be greater than 2")
 	}
 
 	epStartIndex, err := getEpPosInName(entries[0].Name(), entries[1].Name())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get episode position in file name: %q, %w", entries[0].Name(), err)
 	}
 
 	nameEpMap := make(map[int]string, len(entries))
