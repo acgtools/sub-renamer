@@ -7,6 +7,8 @@ on:
   branches:
   - main
 
+permissions:
+  contents: read
 
 jobs:
  ci:
@@ -26,3 +28,6 @@ jobs:
     with:
       version: v1.54
       args: --verbose --timeout=3m --issues-exit-code=1
+
+  - name: Test
+    run: go test -v ./... -race -covermode=atomic
