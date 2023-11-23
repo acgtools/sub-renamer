@@ -1,6 +1,6 @@
 package main
 
-import "github.com/dreamjz/sub-renamer/cmd"
+import "github.com/acgtools/sub-renamer/cmd"
 
 func main() {
 	cmd.Execute()

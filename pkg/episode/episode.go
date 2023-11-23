@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dreamjz/sub-renamer/pkg/util"
+	"github.com/acgtools/sub-renamer/pkg/util"
 )
 
 const (

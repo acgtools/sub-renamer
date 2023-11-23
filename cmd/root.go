@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/dreamjz/sub-renamer/pkg/episode"
-	"github.com/dreamjz/sub-renamer/pkg/log"
+	"github.com/acgtools/sub-renamer/pkg/episode"
+	"github.com/acgtools/sub-renamer/pkg/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

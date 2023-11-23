@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/dreamjz/sub-renamer/pkg/episode"
+	"github.com/acgtools/sub-renamer/pkg/episode"
 	"github.com/stretchr/testify/require"
 )
 

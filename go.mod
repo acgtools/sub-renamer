@@ -1,4 +1,4 @@
-module github.com/dreamjz/sub-renamer
+module github.com/acgtools/sub-renamer
 
 go 1.21
 
