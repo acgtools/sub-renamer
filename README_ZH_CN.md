@@ -9,7 +9,7 @@ English | [简体中文](./)
 ### 使用 `go`
 
 ```sh
-$ go install https://github.com/acgtools/sub-renamer@latest
+$ go install github.com/acgtools/sub-renamer@latest
 ```
 
 ### 从 Release 页面下载
