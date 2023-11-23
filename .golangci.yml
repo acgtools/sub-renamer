@@ -34,3 +34,4 @@ issues:
       linters:
         - funlen
         - govet
+        - cyclop

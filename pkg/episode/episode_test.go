@@ -114,7 +114,6 @@ func genVidSubFiles() {
 		log.Fatalf("failed to generate other file: %v", err)
 	}
 	_ = f4.Close()
-
 }
 
 func TestAutoRename(t *testing.T) {
