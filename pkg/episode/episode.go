@@ -14,11 +14,10 @@ import (
 )
 
 const (
-	minFileNum    = 2
-	minFileExtLen = 2
+	minFileNum = 2
 )
 
-func AutoRename(vidDir, subDir string, vidExt, subExt []string) error {
+func AutoRename(vidDir, subDir string) error {
 	var err error
 
 	if !filepath.IsAbs(vidDir) {
@@ -34,24 +33,21 @@ func AutoRename(vidDir, subDir string, vidExt, subExt []string) error {
 		}
 	}
 
-	slog.Debug("Supported video extensions", "ext", vidExt)
-	slog.Debug("Supported subtitle extensions", "ext", subExt)
+	slog.Info("Video path", "path", vidDir)
+	slog.Info("Subtitle path", "path", subDir)
 
-	slog.Debug("Video path", "path", vidDir)
-	slog.Debug("Subtitle path", "path", subDir)
-
-	vidExtSet := util.SliceToSet(vidExt)
-	vidMap, err := parseEpisodes(vidDir, vidExtSet)
+	slog.Info("Getting episode info...")
+	vidMap, err := parseEpisodes(vidDir)
 	if err != nil {
 		return fmt.Errorf("failed to parse video episode: %w", err)
 	}
 
-	subExtSet := util.SliceToSet(subExt)
-	subMap, err := parseEpisodes(subDir, subExtSet)
+	subMap, err := parseEpisodes(subDir)
 	if err != nil {
 		return fmt.Errorf("failed to parse subtitle episode: %w", err)
 	}
 
+	slog.Info("Renaming...")
 	for ep, vidName := range vidMap {
 		subName, ok := subMap[ep]
 		if !ok {
@@ -70,25 +66,23 @@ func AutoRename(vidDir, subDir string, vidExt, subExt []string) error {
 		}
 	}
 
+	slog.Info("Success!")
 	return nil
 }
 
-func parseEpisodes(dir string, supportedExt map[string]struct{}) (map[int]string, error) {
+func parseEpisodes(dir string) (map[int]string, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read directory: %q, %w", dir, err)
 	}
 
 	if len(entries) < minFileNum {
-		return nil, errors.New("number of file must be greater than 2")
+		return nil, errors.New("number of files must be greater than 2")
 	}
 
-	filteredEntries, err := filterFiles(entries, supportedExt)
-	if err != nil {
-		return nil, err
-	}
+	filteredEntries := filterFiles(entries)
 	if len(filteredEntries) < minFileNum {
-		return nil, errors.New("number of file must be greater than 2")
+		return nil, errors.New("number of files must be greater than 2")
 	}
 
 	epStartIndex, err := getEpPosInName(filteredEntries[0].Name(), filteredEntries[1].Name())
@@ -148,42 +142,10 @@ func isDigit(b byte) bool {
 	return false
 }
 
-func filterFiles(entries []os.DirEntry, supportedExt map[string]struct{}) ([]os.DirEntry, error) {
-	ext, err := determineFileExt(entries, supportedExt)
-	if err != nil {
-		return nil, err
-	}
-
+func filterFiles(entries []os.DirEntry) []os.DirEntry {
 	filteredEntries := util.SliceFilter(entries, func(e os.DirEntry) bool {
-		if e.IsDir() {
-			return false
-		}
-		return fileExtTrimDot(e.Name()) == ext
+		return !e.IsDir()
 	})
 
-	return filteredEntries, nil
-}
-
-func determineFileExt(entries []os.DirEntry, supportedExt map[string]struct{}) (string, error) {
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		fileExt := fileExtTrimDot(e.Name())
-
-		if _, ok := supportedExt[fileExt]; ok {
-			return fileExt, nil
-		}
-	}
-
-	return "", errors.New("no supported files found")
-}
-
-func fileExtTrimDot(name string) string {
-	ext := filepath.Ext(name)
-	if len(ext) < minFileExtLen {
-		return ""
-	}
-
-	return ext[1:]
+	return filteredEntries
 }

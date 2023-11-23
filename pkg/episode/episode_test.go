@@ -1,17 +1,13 @@
 package episode_test
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"log/slog"
 	"os"
 	"testing"
 
-	"github.com/dreamjz/sub-renamer/cmd"
 	"github.com/dreamjz/sub-renamer/pkg/episode"
-	pkglog "github.com/dreamjz/sub-renamer/pkg/log"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,12 +19,9 @@ const (
 	originSub  = exampleDir + "origin-subDir/"
 	vidDir     = exampleDir + "vid/"
 	subDir     = exampleDir + "subDir/"
-
-	cfgDir = rootDir
 )
 
 func TestMain(m *testing.M) {
-	initConfig()
 	initLogger()
 	clean()
 	genVidSubFiles()
@@ -38,29 +31,9 @@ func TestMain(m *testing.M) {
 }
 
 func initLogger() {
-	config, err := cmd.NewConfig()
-	if err != nil {
-		log.Fatalf("failed to read config file: %v", err)
-	}
 	logLevel := slog.LevelDebug
-	if config.Log.Level != "" {
-		logLevel, _ = pkglog.ParseLevel(config.Log.Level)
-	}
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
 	slog.SetDefault(logger)
-}
-
-func initConfig() {
-	viper.SetConfigName("sub-renamer.dev")
-	viper.SetConfigType("yml")
-	viper.AddConfigPath(cfgDir)
-
-	if err := viper.ReadInConfig(); err != nil {
-		var e viper.ConfigFileNotFoundError
-		if !errors.As(err, &e) {
-			log.Fatal("error reading config file", "error", err)
-		}
-	}
 }
 
 func clean() {
@@ -147,24 +120,16 @@ func genVidSubFiles() {
 func TestAutoRename(t *testing.T) {
 	t.Parallel()
 
-	cfg, err := cmd.NewConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
 	for _, tc := range []struct {
 		name    string
 		vidDir  string
 		subDir  string
-		vidExt  []string
-		subExt  []string
 		wantErr bool
 	}{
 		{
 			name:    "Case 01",
 			vidDir:  vidDir,
 			subDir:  subDir,
-			vidExt:  cfg.VidExt,
-			subExt:  cfg.SubExt,
 			wantErr: false,
 		},
 	} {
@@ -172,7 +137,7 @@ func TestAutoRename(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			err := episode.AutoRename(tc.vidDir, tc.subDir, tc.vidExt, tc.subExt)
+			err := episode.AutoRename(tc.vidDir, tc.subDir)
 
 			if tc.wantErr {
 				require.Error(t, err)
