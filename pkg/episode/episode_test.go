@@ -4,11 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"testing"
 
 	"github.com/dreamjz/sub-renamer/cmd"
 	"github.com/dreamjz/sub-renamer/pkg/episode"
+	pkglog "github.com/dreamjz/sub-renamer/pkg/log"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 )
@@ -27,6 +29,7 @@ const (
 
 func TestMain(m *testing.M) {
 	initConfig()
+	initLogger()
 	clean()
 	genVidSubFiles()
 
@@ -34,8 +37,21 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+func initLogger() {
+	config, err := cmd.NewConfig()
+	if err != nil {
+		log.Fatalf("failed to read config file: %v", err)
+	}
+	logLevel := slog.LevelDebug
+	if config.Log.Level != "" {
+		logLevel, _ = pkglog.ParseLevel(config.Log.Level)
+	}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
+	slog.SetDefault(logger)
+}
+
 func initConfig() {
-	viper.SetConfigName("sub-renamer")
+	viper.SetConfigName("sub-renamer.dev")
 	viper.SetConfigType("yml")
 	viper.AddConfigPath(cfgDir)
 

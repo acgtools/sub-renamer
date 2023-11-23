@@ -34,6 +34,12 @@ func AutoRename(vidDir, subDir string, vidExt, subExt []string) error {
 		}
 	}
 
+	slog.Debug("Supported video extensions", "ext", vidExt)
+	slog.Debug("Supported subtitle extensions", "ext", subExt)
+
+	slog.Debug("Video path", "path", vidDir)
+	slog.Debug("Subtitle path", "path", subDir)
+
 	vidExtSet := util.SliceToSet(vidExt)
 	vidMap, err := parseEpisodes(vidDir, vidExtSet)
 	if err != nil {
@@ -53,10 +59,12 @@ func AutoRename(vidDir, subDir string, vidExt, subExt []string) error {
 		}
 
 		subExt := filepath.Ext(subName)
+		newSubName := strings.TrimSuffix(vidName, filepath.Ext(vidName)) + subExt
+		oldSubPath, newSubPath := filepath.Join(subDir, subName), filepath.Join(subDir, newSubName)
 
-		newSubName := strings.TrimSuffix(vidName, filepath.Ext(vidName))
+		slog.Debug("Rename subtitles", "old_path", oldSubPath, "new_path", newSubPath)
 
-		err = os.Rename(filepath.Join(subDir, subName), filepath.Join(subDir, newSubName+subExt))
+		err = os.Rename(oldSubPath, newSubPath)
 		if err != nil {
 			return fmt.Errorf("failed to rename subtitle file: %w", err)
 		}
@@ -92,7 +100,7 @@ func parseEpisodes(dir string, supportedExt map[string]struct{}) (map[int]string
 	for _, entry := range filteredEntries {
 		fileName := entry.Name()
 		if epStartIndex > len(fileName)-1 {
-			slog.Warn(fmt.Sprintf("cannot get episode number, skip: %q", fileName))
+			slog.Warn("Cannot get episode number, skip file", "file_name", fileName)
 			continue
 		}
 		epNum := getEpisodeNum(fileName, epStartIndex)

@@ -57,6 +57,7 @@ func initConfig() {
 		viper.SetConfigName("sub-renamer")
 		viper.SetConfigType("yml")
 		viper.AddConfigPath(".")
+		viper.AddConfigPath("$HOME")
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
