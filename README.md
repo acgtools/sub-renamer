@@ -9,7 +9,7 @@ CLI tool to auto-rename subtitle files for matched video files.
 ### Using `go`
 
 ```sh
-$ go install https://github.com/acgtools/sub-renamer@latest
+$ go install github.com/acgtools/sub-renamer@latest
 ```
 
 ### Download from releases
