@@ -48,7 +48,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() { //nolint:gochecknoinits
-	rootCmd.PersistentFlags().String("log-level", "info", "log level")
+	rootCmd.PersistentFlags().String("log-level", "info", "log level, options: debug, info, warn, error")
 
 	_ = viper.BindPFlag("log.level", rootCmd.PersistentFlags().Lookup("log-level"))
 }

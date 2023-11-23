@@ -1,22 +1,22 @@
 # Sub-Renamer
 
-English | [简体中文](./README_ZH_CN.md)
+English | [简体中文](./)
 
-CLI tool to auto-rename subtitle files for matched video files.
+自动为字幕文件匹配视频并重命名的 CLI 工具。
 
-## Installation
+## 安装
 
-### Using `go`
+### 使用 `go`
 
 ```sh
 $ go install https://github.com/acgtools/sub-renamer@latest
 ```
 
-### Download from releases
+### 从 Release 页面下载
 
 [Release page](https://github.com/acgtools/sub-renamer/releases)
 
-## Quick Start
+## 快速开始
 
 ```sh
 $ sub-reanmer -h
@@ -32,5 +32,5 @@ Flags:
 
 ## Issue
 
-Feel free to create issues for reporting bugs or requesting new features. 
+欢迎创建 issue 来报告 bug 或者 请求添加新特性。
 
