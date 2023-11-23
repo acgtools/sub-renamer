@@ -3,6 +3,7 @@ package episode
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -90,6 +91,10 @@ func parseEpisodes(dir string, supportedExt map[string]struct{}) (map[int]string
 	nameEpMap := make(map[int]string, len(filteredEntries))
 	for _, entry := range filteredEntries {
 		fileName := entry.Name()
+		if epStartIndex > len(fileName)-1 {
+			slog.Warn(fmt.Sprintf("cannot get episode number, skip: %q", fileName))
+			continue
+		}
 		epNum := getEpisodeNum(fileName, epStartIndex)
 		nameEpMap[epNum] = fileName
 	}
@@ -120,7 +125,7 @@ func getEpPosInName(fileName1, fileName2 string) (int, error) {
 
 func getEpisodeNum(fileName string, start int) int {
 	end := start + 1
-	for isDigit(fileName[end]) {
+	for end <= len(fileName)-1 && isDigit(fileName[end]) {
 		end++
 	}
 

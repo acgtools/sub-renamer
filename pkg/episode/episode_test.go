@@ -80,6 +80,52 @@ func genVidSubFiles() {
 		}
 		_ = sub.Close()
 	}
+
+	// some other dir or files
+	dir1, dir2 := "tmp1/", "tmp2/"
+	_ = os.Mkdir(vidDir+dir1, os.ModePerm)
+	_ = os.Mkdir(vidDir+dir2, os.ModePerm)
+	_ = os.Mkdir(subDir+dir1, os.ModePerm)
+	_ = os.Mkdir(subDir+dir2, os.ModePerm)
+
+	tf1, err := os.Create(vidDir + dir1 + "tmp.txt")
+	if err != nil {
+		log.Fatalf("failed to generate other file: %v", err)
+	}
+	_ = tf1.Close()
+
+	tf2, err := os.Create(subDir + dir1 + "tmp.txt")
+	if err != nil {
+		log.Fatalf("failed to generate other file: %v", err)
+	}
+	_ = tf2.Close()
+
+	file1, file2 := "file1.mkv", "file2.txt"
+	f1, err := os.Create(vidDir + file1)
+	if err != nil {
+		log.Fatalf("failed to generate other file: %v", err)
+	}
+	_ = f1.Close()
+
+	f2, err := os.Create(vidDir + file2)
+	if err != nil {
+		log.Fatalf("failed to generate other file: %v", err)
+	}
+	_ = f2.Close()
+
+	file3, file4 := "file3.ass", "file4.txt"
+	f3, err := os.Create(subDir + file3)
+	if err != nil {
+		log.Fatalf("failed to generate other file: %v", err)
+	}
+	_ = f3.Close()
+
+	f4, err := os.Create(subDir + file4)
+	if err != nil {
+		log.Fatalf("failed to generate other file: %v", err)
+	}
+	_ = f4.Close()
+
 }
 
 func TestAutoRename(t *testing.T) {
