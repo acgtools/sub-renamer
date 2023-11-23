@@ -1,9 +1,10 @@
 package util_test
 
 import (
+	"testing"
+
 	"github.com/dreamjz/sub-renamer/pkg/util"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestSliceToSet(t *testing.T) {

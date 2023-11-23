@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"errors"
-	"github.com/spf13/viper"
 	"log/slog"
 	"os"
 
 	"github.com/dreamjz/sub-renamer/pkg/episode"
 	"github.com/dreamjz/sub-renamer/pkg/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const minArgNum = 2

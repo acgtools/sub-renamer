@@ -3,13 +3,14 @@ package episode_test
 import (
 	"errors"
 	"fmt"
+	"log"
+	"os"
+	"testing"
+
 	"github.com/dreamjz/sub-renamer/cmd"
 	"github.com/dreamjz/sub-renamer/pkg/episode"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
-	"log"
-	"os"
-	"testing"
 )
 
 const (
@@ -56,9 +57,9 @@ func genVidSubFiles() {
 		subNameFormat = "[YYDM-11FANS][FAIRY_TAIL][%03d][BDRIP][720P][X264-10bit_AAC][B721D247].tc.ass"
 	)
 
-	_ = os.MkdirAll(vidDir, 0755)
-	_ = os.MkdirAll(originSub, 0755)
-	_ = os.MkdirAll(subDir, 0755)
+	_ = os.MkdirAll(vidDir, os.ModePerm)
+	_ = os.MkdirAll(originSub, os.ModePerm)
+	_ = os.MkdirAll(subDir, os.ModePerm)
 
 	for i := 1; i <= 175; i++ {
 		vid, err := os.Create(vidDir + fmt.Sprintf(vidNameFormat, i))
@@ -116,7 +117,6 @@ func TestAutoRename(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
-
 		})
 	}
 }

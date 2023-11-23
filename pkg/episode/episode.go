@@ -3,12 +3,13 @@ package episode
 import (
 	"errors"
 	"fmt"
-	"github.com/dreamjz/sub-renamer/pkg/util"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/dreamjz/sub-renamer/pkg/util"
 )
 
 const (

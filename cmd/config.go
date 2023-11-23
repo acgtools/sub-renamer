@@ -1,6 +1,10 @@
 package cmd
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	VidExt []string // video extension
@@ -16,7 +20,7 @@ func NewConfig() (*Config, error) {
 	var config *Config
 
 	if err := viper.Unmarshal(&config); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
 	return config, nil
