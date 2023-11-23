@@ -113,12 +113,13 @@ func getEpPosInName(fileName1, fileName2 string) (int, error) {
 		return -1, errors.New("file names are not in same pattern")
 	}
 
-	for _, subMatch := range numMatchIndex1 {
-		num1 := fileName1[subMatch[0]:subMatch[1]]
-		num2 := fileName2[subMatch[0]:subMatch[1]]
+	for i := 0; i < len(numMatchIndex1); i++ {
+		subMatch1, subMatch2 := numMatchIndex1[i], numMatchIndex2[i]
+		num1 := fileName1[subMatch1[0]:subMatch1[1]]
+		num2 := fileName2[subMatch2[0]:subMatch2[1]]
 
 		if num1 != num2 {
-			return subMatch[0], nil
+			return subMatch1[0], nil
 		}
 	}
 
