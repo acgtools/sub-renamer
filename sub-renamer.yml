@@ -1,0 +1,11 @@
+log:
+  level: info
+
+# video file extension
+vidext:
+  - mkv
+  - mp4
+
+# subtitle file extension
+subext:
+  - ass

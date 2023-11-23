@@ -23,4 +23,5 @@ go.work
 # Goland file
 .idea
 
-test
+test/*
+!test/.gitkeep

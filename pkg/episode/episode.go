@@ -3,6 +3,7 @@ package episode
 import (
 	"errors"
 	"fmt"
+	"github.com/dreamjz/sub-renamer/pkg/util"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -10,9 +11,12 @@ import (
 	"strings"
 )
 
-const minFileNum = 2
+const (
+	minFileNum    = 2
+	minFileExtLen = 2
+)
 
-func AutoRename(vidDir, subDir string) error {
+func AutoRename(vidDir, subDir string, vidExt, subExt []string) error {
 	var err error
 
 	if !filepath.IsAbs(vidDir) {
@@ -28,11 +32,14 @@ func AutoRename(vidDir, subDir string) error {
 		}
 	}
 
-	vidMap, err := parseEpisodes(vidDir)
+	vidExtSet := util.SliceToSet(vidExt)
+	vidMap, err := parseEpisodes(vidDir, vidExtSet)
 	if err != nil {
 		return fmt.Errorf("failed to parse video episode: %w", err)
 	}
-	subMap, err := parseEpisodes(subDir)
+
+	subExtSet := util.SliceToSet(subExt)
+	subMap, err := parseEpisodes(subDir, subExtSet)
 	if err != nil {
 		return fmt.Errorf("failed to parse subtitle episode: %w", err)
 	}
@@ -56,7 +63,7 @@ func AutoRename(vidDir, subDir string) error {
 	return nil
 }
 
-func parseEpisodes(dir string) (map[int]string, error) {
+func parseEpisodes(dir string, supportedExt map[string]struct{}) (map[int]string, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read directory: %q, %w", dir, err)
@@ -66,13 +73,21 @@ func parseEpisodes(dir string) (map[int]string, error) {
 		return nil, errors.New("number of file must be greater than 2")
 	}
 
-	epStartIndex, err := getEpPosInName(entries[0].Name(), entries[1].Name())
+	filteredEntries, err := filterFiles(entries, supportedExt)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get episode position in file name: %q, %w", entries[0].Name(), err)
+		return nil, err
+	}
+	if len(filteredEntries) < minFileNum {
+		return nil, errors.New("number of file must be greater than 2")
 	}
 
-	nameEpMap := make(map[int]string, len(entries))
-	for _, entry := range entries {
+	epStartIndex, err := getEpPosInName(filteredEntries[0].Name(), filteredEntries[1].Name())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get episode position in file name: %q, %w", filteredEntries[0].Name(), err)
+	}
+
+	nameEpMap := make(map[int]string, len(filteredEntries))
+	for _, entry := range filteredEntries {
 		fileName := entry.Name()
 		epNum := getEpisodeNum(fileName, epStartIndex)
 		nameEpMap[epNum] = fileName
@@ -117,4 +132,44 @@ func isDigit(b byte) bool {
 		return true
 	}
 	return false
+}
+
+func filterFiles(entries []os.DirEntry, supportedExt map[string]struct{}) ([]os.DirEntry, error) {
+	ext, err := determineFileExt(entries, supportedExt)
+	if err != nil {
+		return nil, err
+	}
+
+	filteredEntries := util.SliceFilter(entries, func(e os.DirEntry) bool {
+		if e.IsDir() {
+			return false
+		}
+		return fileExtTrimDot(e.Name()) == ext
+	})
+
+	return filteredEntries, nil
+}
+
+func determineFileExt(entries []os.DirEntry, supportedExt map[string]struct{}) (string, error) {
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		fileExt := fileExtTrimDot(e.Name())
+
+		if _, ok := supportedExt[fileExt]; ok {
+			return fileExt, nil
+		}
+	}
+
+	return "", errors.New("no supported files found")
+}
+
+func fileExtTrimDot(name string) string {
+	ext := filepath.Ext(name)
+	if len(ext) < minFileExtLen {
+		return ""
+	}
+
+	return ext[1:]
 }

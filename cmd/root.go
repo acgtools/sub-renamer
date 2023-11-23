@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"github.com/spf13/viper"
 	"log/slog"
 	"os"
 
@@ -12,7 +13,7 @@ import (
 
 const minArgNum = 2
 
-var logLevel string
+var configFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -24,19 +25,47 @@ var rootCmd = &cobra.Command{
 			return errors.New("not enough args")
 		}
 
-		logLevel, err := log.ParseLevel(logLevel)
+		config, err := NewConfig()
+		if err != nil {
+			return err
+		}
+
+		logLevel, err := log.ParseLevel(config.Log.Level)
 		if err != nil {
 			return err //nolint:wrapcheck
 		}
 		logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
 		slog.SetDefault(logger)
 
-		return episode.AutoRename(args[0], args[1]) //nolint:wrapcheck
+		return episode.AutoRename(args[0], args[1], config.VidExt, config.SubExt) //nolint:wrapcheck
 	},
 }
 
 func init() { //nolint:gochecknoinits
-	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "log level")
+	cobra.OnInitialize(initConfig)
+
+	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default to sub-renamer.yml)")
+	rootCmd.PersistentFlags().String("log-level", "info", "log level")
+
+	_ = viper.BindPFlag("log.level", rootCmd.Flags().Lookup("log-level"))
+}
+
+func initConfig() {
+	if configFile != "" {
+		viper.SetConfigFile(configFile)
+	} else {
+		viper.SetConfigName("sub-renamer")
+		viper.SetConfigType("yml")
+		viper.AddConfigPath(".")
+	}
+
+	if err := viper.ReadInConfig(); err != nil {
+		var e viper.ConfigFileNotFoundError
+		if !errors.As(err, &e) {
+			slog.Error("error reading config file", "error", err)
+			os.Exit(1)
+		}
+	}
 }
 
 func Execute() {
