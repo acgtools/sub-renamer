@@ -4,6 +4,14 @@ English | [简体中文](./)
 
 自动为字幕文件匹配视频并重命名的 CLI 工具。
 
+<!-- 
+  If you want use your Own Moe-Counter
+  Please refer to the tutorial 
+  in its original repo: https://github.com/journey-ad/Moe-Counter
+  And deploy to the replit or glitch
+-->
+![](https://political-capable-roll.glitch.me/get/@acgtoolssubrenamer?theme=rule34)
+
 ## 安装
 
 ### 使用 `go`

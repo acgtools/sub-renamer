@@ -4,6 +4,14 @@ English | [简体中文](./README_ZH_CN.md)
 
 CLI tool to auto-rename subtitle files for matched video files.
 
+<!-- 
+  If you want use your Own Moe-Counter
+  Please refer to the tutorial 
+  in its original repo: https://github.com/journey-ad/Moe-Counter
+  And deploy to the replit or glitch
+-->
+![](https://political-capable-roll.glitch.me/get/@acgtoolssubrenamer?theme=rule34)
+
 ## Installation
 
 ### Using `go`
