@@ -36,6 +36,7 @@ Usage:
   sub-renamer [flags]
 
 Flags:
+  -c, --copy               copy subtitles after renaming
   -h, --help               help for sub-renamer
       --log-level string   log level, options: debug, info, warn, error (default "info")
   -v, --version            version for sub-renamer
