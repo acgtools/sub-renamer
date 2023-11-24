@@ -24,13 +24,13 @@ func AutoRename(vidDir, subDir string, cpy bool) error {
 	if !filepath.IsAbs(vidDir) {
 		vidDir, err = filepath.Abs(vidDir)
 		if err != nil {
-			return fmt.Errorf("failed to convert video path %q to absolute path: %w", vidDir, err)
+			return fmt.Errorf("convert video path %q to absolute path: %w", vidDir, err)
 		}
 	}
 	if !filepath.IsAbs(subDir) {
 		subDir, err = filepath.Abs(subDir)
 		if err != nil {
-			return fmt.Errorf("failed to convert subtitle path %q to absolute path: %w", subDir, err)
+			return fmt.Errorf("convert subtitle path %q to absolute path: %w", subDir, err)
 		}
 	}
 
@@ -40,12 +40,12 @@ func AutoRename(vidDir, subDir string, cpy bool) error {
 	slog.Info("Getting episode info...")
 	vidMap, err := parseEpisodes(vidDir)
 	if err != nil {
-		return fmt.Errorf("failed to parse video episode: %w", err)
+		return fmt.Errorf("parse video episode: %w", err)
 	}
 
 	subMap, err := parseEpisodes(subDir)
 	if err != nil {
-		return fmt.Errorf("failed to parse subtitle episode: %w", err)
+		return fmt.Errorf("parse subtitle episode: %w", err)
 	}
 
 	slog.Info("Renaming...")
@@ -63,7 +63,7 @@ func AutoRename(vidDir, subDir string, cpy bool) error {
 
 		err = os.Rename(oldSubPath, newSubPath)
 		if err != nil {
-			return fmt.Errorf("failed to rename subtitle file: %w", err)
+			return fmt.Errorf("rename subtitle file: %w", err)
 		}
 	}
 
@@ -82,7 +82,7 @@ func AutoRename(vidDir, subDir string, cpy bool) error {
 func parseEpisodes(dir string) (map[int]string, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read directory: %q, %w", dir, err)
+		return nil, fmt.Errorf("read directory: %q, %w", dir, err)
 	}
 
 	if len(entries) < minFileNum {
@@ -96,7 +96,7 @@ func parseEpisodes(dir string) (map[int]string, error) {
 
 	epStartIndex, err := getEpPosInName(filteredEntries[0].Name(), filteredEntries[1].Name())
 	if err != nil {
-		return nil, fmt.Errorf("failed to get episode position in file name: %q, %w", filteredEntries[0].Name(), err)
+		return nil, fmt.Errorf("get episode position in file name: %q, %w", filteredEntries[0].Name(), err)
 	}
 
 	nameEpMap := make(map[int]string, len(filteredEntries))
