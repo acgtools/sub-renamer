@@ -7,9 +7,7 @@ import (
 )
 
 type Config struct {
-	VidExt []string // video extension
-	SubExt []string // subtitle extension
-	Log    *LogConfig
+	Log *LogConfig
 }
 
 type LogConfig struct {
