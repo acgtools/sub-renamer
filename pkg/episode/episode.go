@@ -3,6 +3,7 @@ package episode
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -17,19 +18,19 @@ const (
 	minFileNum = 2
 )
 
-func AutoRename(vidDir, subDir string) error {
+func AutoRename(vidDir, subDir string, cpy bool) error {
 	var err error
 
 	if !filepath.IsAbs(vidDir) {
 		vidDir, err = filepath.Abs(vidDir)
 		if err != nil {
-			return fmt.Errorf("failed to convert video path %q to absolute path: %w", vidDir, err)
+			return fmt.Errorf("convert video path %q to absolute path: %w", vidDir, err)
 		}
 	}
 	if !filepath.IsAbs(subDir) {
 		subDir, err = filepath.Abs(subDir)
 		if err != nil {
-			return fmt.Errorf("failed to convert subtitle path %q to absolute path: %w", subDir, err)
+			return fmt.Errorf("convert subtitle path %q to absolute path: %w", subDir, err)
 		}
 	}
 
@@ -39,15 +40,33 @@ func AutoRename(vidDir, subDir string) error {
 	slog.Info("Getting episode info...")
 	vidMap, err := parseEpisodes(vidDir)
 	if err != nil {
-		return fmt.Errorf("failed to parse video episode: %w", err)
+		return fmt.Errorf("parse video episode: %w", err)
 	}
 
 	subMap, err := parseEpisodes(subDir)
 	if err != nil {
-		return fmt.Errorf("failed to parse subtitle episode: %w", err)
+		return fmt.Errorf("parse subtitle episode: %w", err)
 	}
 
 	slog.Info("Renaming...")
+	err = renamesSubs(subDir, vidMap, subMap)
+	if err != nil {
+		return err
+	}
+
+	if cpy {
+		slog.Info("Copying subs...")
+
+		if err := copySubs(vidDir, subDir); err != nil {
+			return fmt.Errorf("copy subs: %w", err)
+		}
+	}
+
+	slog.Info("Success!")
+	return nil
+}
+
+func renamesSubs(subDir string, vidMap, subMap map[int]string) error {
 	for ep, vidName := range vidMap {
 		subName, ok := subMap[ep]
 		if !ok {
@@ -60,20 +79,19 @@ func AutoRename(vidDir, subDir string) error {
 
 		slog.Debug("Rename subtitles", "old_path", oldSubPath, "new_path", newSubPath)
 
-		err = os.Rename(oldSubPath, newSubPath)
+		err := os.Rename(oldSubPath, newSubPath)
 		if err != nil {
-			return fmt.Errorf("failed to rename subtitle file: %w", err)
+			return fmt.Errorf("rename subtitle file: %w", err)
 		}
 	}
 
-	slog.Info("Success!")
 	return nil
 }
 
 func parseEpisodes(dir string) (map[int]string, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read directory: %q, %w", dir, err)
+		return nil, fmt.Errorf("read directory: %q, %w", dir, err)
 	}
 
 	if len(entries) < minFileNum {
@@ -87,7 +105,7 @@ func parseEpisodes(dir string) (map[int]string, error) {
 
 	epStartIndex, err := getEpPosInName(filteredEntries[0].Name(), filteredEntries[1].Name())
 	if err != nil {
-		return nil, fmt.Errorf("failed to get episode position in file name: %q, %w", filteredEntries[0].Name(), err)
+		return nil, fmt.Errorf("get episode position in file name: %q, %w", filteredEntries[0].Name(), err)
 	}
 
 	nameEpMap := make(map[int]string, len(filteredEntries))
@@ -149,4 +167,50 @@ func filterFiles(entries []os.DirEntry) []os.DirEntry {
 	})
 
 	return filteredEntries
+}
+
+func copyFile(dstPath, srcPath string) error {
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return fmt.Errorf("open file %q: %w", srcPath, err)
+	}
+	defer fClose(src)
+
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		return fmt.Errorf("create file: %q: %w", dstPath, err)
+	}
+	defer fClose(dst)
+
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return fmt.Errorf("copy %q to %q: %w", srcPath, dstPath, err)
+	}
+
+	return nil
+}
+
+func fClose(f *os.File) {
+	_ = f.Close()
+}
+
+func copySubs(vidDir, subDir string) error {
+	entries, err := os.ReadDir(subDir)
+	if err != nil {
+		return fmt.Errorf("read directory %q: %w", subDir, err)
+	}
+
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+
+		name := e.Name()
+		err := copyFile(filepath.Join(vidDir, name), filepath.Join(subDir, name))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
