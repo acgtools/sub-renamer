@@ -49,6 +49,24 @@ func AutoRename(vidDir, subDir string, cpy bool) error {
 	}
 
 	slog.Info("Renaming...")
+	err = renamesSubs(subDir, vidMap, subMap)
+	if err != nil {
+		return err
+	}
+
+	if cpy {
+		slog.Info("Copying subs...")
+
+		if err := copySubs(vidDir, subDir); err != nil {
+			return fmt.Errorf("copy subs: %w", err)
+		}
+	}
+
+	slog.Info("Success!")
+	return nil
+}
+
+func renamesSubs(subDir string, vidMap, subMap map[int]string) error {
 	for ep, vidName := range vidMap {
 		subName, ok := subMap[ep]
 		if !ok {
@@ -61,21 +79,12 @@ func AutoRename(vidDir, subDir string, cpy bool) error {
 
 		slog.Debug("Rename subtitles", "old_path", oldSubPath, "new_path", newSubPath)
 
-		err = os.Rename(oldSubPath, newSubPath)
+		err := os.Rename(oldSubPath, newSubPath)
 		if err != nil {
 			return fmt.Errorf("rename subtitle file: %w", err)
 		}
 	}
 
-	if cpy {
-		slog.Info("Copying subs...")
-
-		if err := copySubs(vidDir, subDir); err != nil {
-			return fmt.Errorf("copy subs: %w", err)
-		}
-	}
-
-	slog.Info("Success!")
 	return nil
 }
 
