@@ -65,7 +65,7 @@ Flags:
    # Rename subtitle files only
    .\sub-renamer.exe "<video path>" "<subtitle path>"
    
-   # Using -c to copy subtitle files to video folder
+   # Using -c will copy subtitle files to the video folder after renaming
    .\sub-renamer.exe -c "<video path>" "<subtitle path>"
    ```
 
