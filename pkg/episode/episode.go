@@ -3,6 +3,7 @@ package episode
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -17,7 +18,7 @@ const (
 	minFileNum = 2
 )
 
-func AutoRename(vidDir, subDir string) error {
+func AutoRename(vidDir, subDir string, cpy bool) error {
 	var err error
 
 	if !filepath.IsAbs(vidDir) {
@@ -63,6 +64,14 @@ func AutoRename(vidDir, subDir string) error {
 		err = os.Rename(oldSubPath, newSubPath)
 		if err != nil {
 			return fmt.Errorf("failed to rename subtitle file: %w", err)
+		}
+	}
+
+	if cpy {
+		slog.Info("Copying subs...")
+
+		if err := copySubs(vidDir, subDir); err != nil {
+			return fmt.Errorf("copy subs: %w", err)
 		}
 	}
 
@@ -149,4 +158,50 @@ func filterFiles(entries []os.DirEntry) []os.DirEntry {
 	})
 
 	return filteredEntries
+}
+
+func copyFile(dstPath, srcPath string) error {
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return fmt.Errorf("open file %q: %w", srcPath, err)
+	}
+	defer fClose(src)
+
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		return fmt.Errorf("create file: %q: %w", dstPath, err)
+	}
+	defer fClose(dst)
+
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return fmt.Errorf("copy %q to %q: %w", srcPath, dstPath, err)
+	}
+
+	return nil
+}
+
+func fClose(f *os.File) {
+	_ = f.Close()
+}
+
+func copySubs(vidDir, subDir string) error {
+	entries, err := os.ReadDir(subDir)
+	if err != nil {
+		return fmt.Errorf("read directory %q: %w", subDir, err)
+	}
+
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+
+		name := e.Name()
+		err := copyFile(filepath.Join(vidDir, name), filepath.Join(subDir, name))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

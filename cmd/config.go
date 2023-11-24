@@ -7,7 +7,8 @@ import (
 )
 
 type Config struct {
-	Log *LogConfig
+	Copy bool
+	Log  *LogConfig
 }
 
 type LogConfig struct {

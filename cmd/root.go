@@ -46,14 +46,16 @@ var rootCmd = &cobra.Command{
 		}))
 		slog.SetDefault(logger)
 
-		return episode.AutoRename(args[0], args[1]) //nolint:wrapcheck
+		return episode.AutoRename(args[0], args[1], config.Copy) //nolint:wrapcheck
 	},
 }
 
 func init() { //nolint:gochecknoinits
 	rootCmd.PersistentFlags().String("log-level", "info", "log level, options: debug, info, warn, error")
+	rootCmd.PersistentFlags().BoolP("copy", "c", false, "copy subtitles after renaming")
 
 	_ = viper.BindPFlag("log.level", rootCmd.PersistentFlags().Lookup("log-level"))
+	_ = viper.BindPFlag("copy", rootCmd.PersistentFlags().Lookup("copy"))
 }
 
 func Execute() {
