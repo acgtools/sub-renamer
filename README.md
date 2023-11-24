@@ -9,7 +9,7 @@ CLI tool to auto-rename subtitle files for matched video files.
 ### Using `go`
 
 ```sh
-$ go install github.com/acgtools/sub-renamer@latest
+$ go install -ldflags "-w -s" github.com/acgtools/sub-renamer@latest
 ```
 
 ### Download from releases
@@ -28,6 +28,8 @@ Usage:
 Flags:
   -h, --help               help for sub-renamer
       --log-level string   log level, options: debug, info, warn, error (default "info")
+  -v, --version            version for sub-renamer
+
 ```
 
 ## Issue

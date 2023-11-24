@@ -13,11 +13,14 @@ import (
 
 const minArgNum = 2
 
+var version = "dev"
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "sub-renamer",
-	Short: "Auto rename subtitle files to match video files",
-	Long:  "sub-renamer <video dir> <sub dir>",
+	Use:     "sub-renamer",
+	Short:   "Auto rename subtitle files to match video files",
+	Long:    "sub-renamer <video dir> <sub dir>",
+	Version: version,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < minArgNum {
 			return errors.New("not enough args")
