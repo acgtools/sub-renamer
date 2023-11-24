@@ -31,7 +31,7 @@ jobs:
           GOOS: linux
           GOARCH: amd64
         run: |-
-          go build -v -ldflags "-s -w" -o sub-renamer
+          go build -v -ldflags "-s -w -X github.com/acgtools/sub-renamer/cmd.version=$GITHUB_REF_NAME" -o sub-renamer
           tar -zcvf ./sub_renamer_linux_amd64.tar.gz ./README.md ./LICENSE ./sub-renamer
 
       - name: Windows amd64
@@ -39,7 +39,7 @@ jobs:
           GOOS: windows
           GOARCH: amd64
         run: |-
-          go build -v -ldflags "-s -w" -o sub-renamer.exe
+          go build -v -ldflags "-s -w -X github.com/acgtools/sub-renamer/cmd.version=$GITHUB_REF_NAME" -o sub-renamer.exe
           zip ./sub_renamer_windows_amd64.zip ./README.md ./LICENSE ./sub-renamer.exe
 
       - name: Release

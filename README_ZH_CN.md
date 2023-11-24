@@ -9,7 +9,7 @@ English | [简体中文](./)
 ### 使用 `go`
 
 ```sh
-$ go install github.com/acgtools/sub-renamer@latest
+$ go install -ldflags "-w -s" github.com/acgtools/sub-renamer@latest
 ```
 
 ### 从 Release 页面下载
@@ -28,6 +28,8 @@ Usage:
 Flags:
   -h, --help               help for sub-renamer
       --log-level string   log level, options: debug, info, warn, error (default "info")
+  -v, --version            version for sub-renamer
+
 ```
 
 ## Issue
