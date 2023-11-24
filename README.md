@@ -62,7 +62,11 @@ Flags:
    > Since it will rename files in the second parameter, this process is irreversible. Creating backups for video files is otherwise cumbersome due to their large size.
 
    ```cmd
+   # Rename subtitle files only
    .\sub-renamer.exe "<video path>" "<subtitle path>"
+   
+   # Using -c to copy subtitle files to video folder
+   .\sub-renamer.exe -c "<video path>" "<subtitle path>"
    ```
 
 ![](./docs/assets/how_to_use.gif)
