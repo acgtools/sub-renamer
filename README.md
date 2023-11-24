@@ -2,13 +2,15 @@
 
 English | [简体中文](./README_ZH_CN.md)
 
-CLI tool to auto-rename subtitle files for matched video files.
+A CLI tool designed to automatically rename subtitle files corresponding to matched video files. 
+
+If this tool is helpful to you, please consider giving it a star. Thank you OwO.
 
 <!-- 
-  If you want use your Own Moe-Counter
-  Please refer to the tutorial 
+  If you prefer to use your own Moe-Counter
+  please refer to the tutorial 
   in its original repo: https://github.com/journey-ad/Moe-Counter
-  And deploy to the replit or glitch
+  and deploy it to the Replit or Glitch
 -->
 ![](https://political-capable-roll.glitch.me/get/@acgtoolssubrenamer?theme=rule34)
 
@@ -40,7 +42,31 @@ Flags:
 
 ```
 
+### How to use on windows
+
+1. Download the zip file and extract it to the folder you’d like.
+
+2. Open the `cmd`: you can search for “cmd” in the Windows search bar, then click "Command Prompt"
+
+3. Copy the path of the folder you just extracted. Input the following command and press `enter`:
+
+   ```cmd
+   cd /d "<path you copied>"
+   ```
+
+4. Copy the path of the video and subtitle folder, input the following command, and press `enter`:
+
+   > **Caution:  Please ensure that the video file path is provided as the first argument.**
+   >
+   > Since it will rename files in the second parameter, this process is irreversible. Creating backups for video files is otherwise cumbersome due to their large size.
+
+   ```cmd
+   .\sub-renamer.exe "<video path>" "<subtitle path>"
+   ```
+
+![](./docs/assets/how_to_use.gif)
+
 ## Issue
 
-Feel free to create issues for reporting bugs or requesting new features. 
+Feel free to create issues to report bugs or request new features. 
 
