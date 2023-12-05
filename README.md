@@ -4,7 +4,13 @@ English | [简体中文](./README_ZH_CN.md)
 
 A CLI tool designed to automatically rename subtitle files corresponding to matched video files. 
 
-If this tool is helpful to you, please consider giving it a star. Thank you OwO.
+<br/>
+
+If this tool is helpful to you, please consider giving it a star (o゜▽゜)o☆ . Thank you OwO. 
+
+> Random Wink OvO
+
+<img align="left" src="https://waifu-pics-black.vercel.app/sfw?eps=wink" />
 
 <!-- 
   If you prefer to use your own Moe-Counter

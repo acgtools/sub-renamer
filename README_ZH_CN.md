@@ -4,7 +4,11 @@ English | [简体中文](./)
 
 自动为字幕文件匹配视频并重命名的 CLI 工具。
 
-如果这个程序对你有所帮助，可以帮忙给一个 star，谢谢 OwO。
+如果这个程序对你有所帮助，可以帮忙给一个 star  (o゜▽゜)o☆ ，谢谢 OwO。
+
+> 随机 Wink OvO
+
+<img align="left" src="https://waifu-pics-black.vercel.app/sfw?eps=wink" />
 
 <!-- 
   If you prefer to use your own Moe-Counter
