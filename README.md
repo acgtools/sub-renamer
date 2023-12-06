@@ -6,11 +6,11 @@ A CLI tool designed to automatically rename subtitle files corresponding to matc
 
 <br/>
 
-If this tool is helpful to you, please consider giving it a star (o゜▽゜)o☆ . Thank you OwO. 
+If this repo is helpful to you, please consider giving it a star (o゜▽゜)o☆ . Thank you OwO. 
 
 > Random Wink OvO
 
-<img align="left" src="https://waifu-pics-black.vercel.app/sfw?eps=wink" />
+<img align="left" src="https://waifu-getter.vercel.app/sfw?eps=wink" />
 
 <br />
 
